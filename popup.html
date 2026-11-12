@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NovaFolio — Portfolio Simulator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Top Demo Banner -->
+    <div class="demo-banner">
+      <span class="demo-dot"></span>
+      <span>NOVAFOLIO • PORTFOLIO SIMULATOR (DEMO)</span>
+    </div>
+
+    <!-- Triggered Alert Banner -->
+    <div id="alert-banner" class="alert-banner hidden">
+      <span id="alert-banner-text">🔔 Price Alert Triggered!</span>
+      <button type="button" id="dismiss-alert-banner">✕</button>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden">Copied to clipboard</div>
+
+    <!-- SCREEN 1: LOCK / PASSWORD SCREEN -->
+    <section id="lock-screen" class="screen active">
+      <div class="lock-container">
+        <div class="brand-logo-wrap">
+          <img src="icon.png" alt="NovaFolio Logo" class="brand-logo" />
+        </div>
+        <h1 class="brand-title">NovaFolio</h1>
+        <p class="brand-subtitle" id="lock-subtitle">Enter your passcode to unlock your simulated portfolio</p>
+
+        <form id="unlock-form" class="lock-form">
+          <div class="input-group">
+            <label for="password-input" id="password-label">Passcode</label>
+            <input
+              type="password"
+              id="password-input"
+              placeholder="Enter password..."
+              autocomplete="current-password"
+              required
+            />
+          </div>
+          <p id="lock-error" class="error-text hidden">Incorrect password. Try again.</p>
+          <button type="submit" class="btn-primary" id="unlock-btn">Unlock Portfolio</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: MAIN UNLOCKED SHELL -->
+    <section id="dashboard-screen" class="screen">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="wallet-selector-wrap">
+          <button id="wallet-dropdown-btn" class="wallet-selector-btn" title="Switch Portfolio">
+            <div class="wallet-avatar" id="active-wallet-avatar">P1</div>
+            <div class="wallet-name-group">
+              <span class="wallet-label">Simulated Account</span>
+              <div class="wallet-title-row">
+                <span id="active-wallet-name">Main Portfolio</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </div>
+            </div>
+          </button>
+        </div>
+
+        <div class="header-actions">
+          <button id="currency-cycle-btn" class="currency-badge-btn" title="Switch Display Currency">
+            USD
+          </button>
+          <button id="refresh-prices-btn" class="icon-btn" title="Refresh Live Prices">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+              <path d="M3 3v5h5" />
+              <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+              <path d="M16 21h5v-5" />
+            </svg>
+          </button>
+          <button id="open-settings-btn" class="icon-btn" title="Edit Holdings & Avg Buy Price">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+            </svg>
+          </button>
+          <button id="lock-app-btn" class="icon-btn" title="Lock Extension">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB VIEWS CONTAINER -->
+      <main class="tab-views-container">
+        <!-- TAB 1: HOME (PORTFOLIO) -->
+        <div id="tab-home" class="tab-view active">
+          <div class="hero-card">
+            <div class="hero-card-top">
+              <span class="hero-caption">Total Simulated Value</span>
+              <div class="hero-top-right">
+                <span id="price-status" class="price-status">Live • Binance</span>
+                <button id="toggle-visibility-btn" class="visibility-btn" title="Show/Hide Balance">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="hero-balance-row">
+              <div>
+                <div id="total-balance-display" class="total-balance">$0.00</div>
+                <span id="portfolio-24h-change" class="change-pill neutral">$0.00 (0.00%) 24h</span>
+              </div>
+              <div id="portfolio-sparkline" class="hero-sparkline"></div>
+            </div>
+
+            <div class="quick-actions-4">
+              <button class="action-pill" id="home-send-btn">
+                <span class="action-icon">↗</span>
+                <span>Send Sim</span>
+              </button>
+              <button class="action-pill" id="home-receive-btn">
+                <span class="action-icon">↙</span>
+                <span>Receive</span>
+              </button>
+              <button class="action-pill" id="home-swap-btn">
+                <span class="action-icon">⇄</span>
+                <span>Swap</span>
+              </button>
+              <button class="action-pill" id="quick-edit-btn">
+                <span class="action-icon">✎</span>
+                <span>Balances</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="section-toolbar">
+            <span class="section-heading">Portfolio Assets (9)</span>
+            <label class="hide-zero-toggle">
+              <input type="checkbox" id="hide-zero-checkbox" />
+              <span>Hide 0 balances</span>
+            </label>
+          </div>
+
+          <div id="token-list" class="token-list"></div>
+        </div>
+
+        <!-- SUB-VIEW: TOKEN DETAILS -->
+        <div id="tab-token-detail" class="tab-view">
+          <div class="detail-header-bar">
+            <button id="detail-back-btn" class="back-btn">← Back</button>
+            <div class="detail-title-group">
+              <span id="detail-token-name">Bitcoin</span>
+              <span id="detail-token-network" class="token-network-tag">BTC</span>
+            </div>
+            <button id="detail-edit-qty-btn" class="btn-tiny">Edit Qty</button>
+          </div>
+
+          <div class="detail-price-card">
+            <div class="detail-top-row">
+              <div id="detail-token-icon" class="detail-icon-wrap"></div>
+              <div>
+                <div id="detail-live-price" class="detail-price">$0.00</div>
+                <span id="detail-24h-pill" class="change-pill neutral">0.00% (24h)</span>
+              </div>
+              <div class="timeframe-pills" id="detail-timeframe-pills">
+                <button type="button" class="tf-btn active" data-tf="24H">24H</button>
+                <button type="button" class="tf-btn" data-tf="7D">7D</button>
+                <button type="button" class="tf-btn" data-tf="30D">30D</button>
+              </div>
+            </div>
+
+            <div id="detail-chart-container" class="detail-chart-box"></div>
+
+            <div class="detail-holding-strip">
+              <div>
+                <span class="holding-caption">Simulated Holding</span>
+                <div id="detail-holding-qty" class="holding-qty">0 BTC</div>
+              </div>
+              <div style="text-align: right">
+                <span class="holding-caption">Market Value</span>
+                <div id="detail-holding-fiat" class="holding-fiat">$0.00</div>
+              </div>
+            </div>
+
+            <div class="detail-actions-row">
+              <button type="button" class="btn-primary btn-sm" id="detail-send-btn">↗ Send Sim</button>
+              <button type="button" class="btn-secondary btn-sm" id="detail-receive-btn">↙ Receive QR</button>
+              <button type="button" class="btn-secondary btn-sm" id="detail-swap-btn">⇄ Swap</button>
+            </div>
+          </div>
+
+          <div class="section-toolbar">
+            <span class="section-heading">Asset Activity</span>
+          </div>
+          <div id="detail-activity-list" class="activity-list"></div>
+        </div>
+
+        <!-- TAB 2: PORTFOLIO ANALYTICS (DONUT + PNL + RISK SCORE) -->
+        <div id="tab-analytics" class="tab-view">
+          <div class="tab-inner-pad">
+            <!-- Donut & Risk Score Card -->
+            <div class="analytics-card">
+              <div class="analytics-top-header">
+                <span class="card-title">Asset Allocation & Risk</span>
+                <span id="risk-score-badge" class="risk-badge">Balanced</span>
+              </div>
+              <div class="donut-layout">
+                <div id="donut-chart-box" class="donut-box"></div>
+                <div id="donut-legend" class="donut-legend"></div>
+              </div>
+              <div id="risk-summary-line" class="risk-summary-line">
+                Stablecoin Ratio: 0% • Top Asset Share: 0%
+              </div>
+            </div>
+
+            <!-- Total Unrealized PnL Summary -->
+            <div class="pnl-summary-card">
+              <div>
+                <span class="holding-caption">Total Cost Basis</span>
+                <div id="analytics-total-cost" class="holding-qty">$0.00</div>
+              </div>
+              <div style="text-align: right">
+                <span class="holding-caption">Unrealized Profit / Loss (PnL)</span>
+                <div id="analytics-total-pnl" class="holding-fiat">$0.00 (0.00%)</div>
+              </div>
+            </div>
+
+            <div class="section-toolbar" style="padding: 0 2px">
+              <span class="section-heading">Asset Performance vs Avg Buy Price</span>
+              <button type="button" id="analytics-edit-cost-btn" class="btn-tiny">Edit Buy Prices</button>
+            </div>
+
+            <div id="analytics-pnl-list" class="activity-list"></div>
+          </div>
+        </div>
+
+        <!-- TAB 3: EARN / STAKING SIMULATOR -->
+        <div id="tab-earn" class="tab-view">
+          <div class="tab-inner-pad">
+            <!-- Staking Overview Card -->
+            <div class="earn-hero-card">
+              <div>
+                <span class="holding-caption">Total Staked Value</span>
+                <div id="earn-total-staked" class="earn-big-val">$0.00</div>
+              </div>
+              <div style="text-align: right">
+                <span class="holding-caption">Est. Annual Yield (APY)</span>
+                <div id="earn-est-annual" class="earn-yield-val">+$0.00 / yr</div>
+              </div>
+            </div>
+
+            <!-- Compound Yield Calculator -->
+            <div class="yield-calc-card">
+              <div class="yield-calc-header">
+                <span class="card-title">Compound Yield Estimator</span>
+                <div class="timeframe-pills" id="earn-horizon-pills">
+                  <button type="button" class="tf-btn" data-months="1">1M</button>
+                  <button type="button" class="tf-btn" data-months="6">6M</button>
+                  <button type="button" class="tf-btn active" data-months="12">1Y</button>
+                </div>
+              </div>
+              <div id="earn-projection-box" class="earn-projection-text">
+                Projected Staking Rewards (1Y): +$0.00
+              </div>
+            </div>
+
+            <div class="section-toolbar" style="padding: 0 2px">
+              <span class="section-heading">Active Staking Pools (6)</span>
+              <button type="button" id="claim-all-rewards-btn" class="btn-tiny" style="color:#34d399;border-color:rgba(16,185,129,0.4);">
+                + Claim Daily Yield
+              </button>
+            </div>
+
+            <div id="earn-pools-list" class="activity-list"></div>
+          </div>
+        </div>
+
+        <!-- TAB 4: MARKET & SWAP -->
+        <div id="tab-trade" class="tab-view">
+          <div class="tab-inner-pad">
+            <div class="subtab-bar">
+              <button type="button" class="trade-subtab-btn subtab-btn active" data-tradesub="trade-swap-pane">Instant Swap</button>
+              <button type="button" class="trade-subtab-btn subtab-btn" data-tradesub="trade-market-pane">Live Market</button>
+            </div>
+
+            <!-- Subpane 1: Swap -->
+            <div id="trade-swap-pane" class="subtab-pane active">
+              <div class="swap-card">
+                <h2 class="card-title">Instant Portfolio Rebalance (Swap)</h2>
+                <p class="card-desc">Convert simulated holdings using live Binance spot rates.</p>
+
+                <form id="swap-form" class="swap-form">
+                  <div class="swap-box">
+                    <div class="swap-box-top">
+                      <span>From Asset</span>
+                      <span id="swap-avail-label" class="swap-avail">Avail: 0</span>
+                    </div>
+                    <div class="swap-box-main">
+                      <select id="swap-from-symbol"></select>
+                      <input type="number" id="swap-from-amount" step="any" min="0.000001" placeholder="0.00" required />
+                    </div>
+                  </div>
+
+                  <div class="swap-flip-wrap">
+                    <button type="button" id="swap-flip-btn" class="swap-flip-btn" title="Flip Assets">⇅</button>
+                  </div>
+
+                  <div class="swap-box">
+                    <div class="swap-box-top">
+                      <span>To Asset (Estimated)</span>
+                      <span id="swap-rate-label" class="swap-avail">Rate: --</span>
+                    </div>
+                    <div class="swap-box-main">
+                      <select id="swap-to-symbol"></select>
+                      <input type="text" id="swap-to-preview" readonly placeholder="0.00" />
+                    </div>
+                  </div>
+
+                  <div id="swap-preview" class="swap-preview">Enter an amount to calculate live conversion.</div>
+                  <button type="submit" class="btn-primary">Execute Simulated Swap</button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Subpane 2: Live Market -->
+            <div id="trade-market-pane" class="subtab-pane">
+              <div class="market-search-row" style="margin-bottom: 8px">
+                <input type="text" id="market-search-input" placeholder="Search coin name or symbol..." />
+              </div>
+              <div id="market-list" class="token-list" style="padding: 0"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: HUB (ACTIVITY, PRICE ALERTS, ADDRESS BOOK, SETTINGS) -->
+        <div id="tab-hub" class="tab-view">
+          <div class="tab-inner-pad">
+            <div class="subtab-bar-4">
+              <button type="button" class="hub-subtab-btn subtab-btn active" data-hubsub="hub-history-pane">History</button>
+              <button type="button" class="hub-subtab-btn subtab-btn" data-hubsub="hub-alerts-pane">Alerts</button>
+              <button type="button" class="hub-subtab-btn subtab-btn" data-hubsub="hub-contacts-pane">Contacts</button>
+              <button type="button" class="hub-subtab-btn subtab-btn" data-hubsub="hub-prefs-pane">Settings</button>
+            </div>
+
+            <!-- Hub Pane 1: Activity Log -->
+            <div id="hub-history-pane" class="subtab-pane active">
+              <div class="section-toolbar" style="padding: 4px 2px 6px">
+                <span class="section-heading">Simulated Transactions</span>
+                <button type="button" id="clear-history-btn" class="btn-tiny">Clear Log</button>
+              </div>
+              <div id="activity-log-list" class="activity-list"></div>
+            </div>
+
+            <!-- Hub Pane 2: Price Alerts -->
+            <div id="hub-alerts-pane" class="subtab-pane">
+              <form id="create-alert-form" class="inline-card-form">
+                <div class="card-title">Create Live Price Alert (USD)</div>
+                <div class="alert-form-row">
+                  <select id="alert-symbol-select"></select>
+                  <select id="alert-condition-select">
+                    <option value="above">Above (≥)</option>
+                    <option value="below">Below (≤)</option>
+                  </select>
+                  <input type="number" id="alert-target-price" step="any" min="0.0001" placeholder="Target $" required />
+                </div>
+                <button type="submit" class="btn-primary btn-sm">+ Add Price Alert</button>
+              </form>
+              <div id="price-alerts-list" class="activity-list" style="margin-top: 8px"></div>
+            </div>
+
+            <!-- Hub Pane 3: Address Book / Contacts -->
+            <div id="hub-contacts-pane" class="subtab-pane">
+              <form id="create-contact-form" class="inline-card-form">
+                <div class="card-title">Add Saved Demo Address</div>
+                <div class="contact-form-row">
+                  <input type="text" id="contact-name-input" placeholder="Label (e.g. Cold Vault)" maxlength="24" required />
+                  <select id="contact-symbol-select"></select>
+                </div>
+                <input type="text" id="contact-address-input" placeholder="Wallet address (e.g. 0x71C...89A)" required />
+                <button type="submit" class="btn-primary btn-sm">+ Save to Address Book</button>
+              </form>
+              <div id="contacts-list" class="activity-list" style="margin-top: 8px"></div>
+            </div>
+
+            <!-- Hub Pane 4: Preferences & Security -->
+            <div id="hub-prefs-pane" class="subtab-pane">
+              <div class="prefs-card">
+                <div class="pref-row">
+                  <div>
+                    <div class="pref-title">Display Currency</div>
+                    <div class="pref-sub">Fiat unit for portfolio valuation</div>
+                  </div>
+                  <select id="pref-currency-select" class="pref-select">
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="GBP">GBP (£)</option>
+                  </select>
+                </div>
+
+                <div class="pref-row">
+                  <div>
+                    <div class="pref-title">Auto-Lock Timer</div>
+                    <div class="pref-sub">Lock extension after inactivity</div>
+                  </div>
+                  <select id="pref-autolock-select" class="pref-select">
+                    <option value="1">1 Minute</option>
+                    <option value="5">5 Minutes</option>
+                    <option value="15">15 Minutes</option>
+                    <option value="0">Never</option>
+                  </select>
+                </div>
+
+                <div class="pref-row">
+                  <div>
+                    <div class="pref-title">Edit Holdings & Buy Prices</div>
+                    <div class="pref-sub">Modify quantities and avg cost</div>
+                  </div>
+                  <button type="button" id="pref-open-balances-btn" class="btn-secondary btn-sm">Edit Holdings</button>
+                </div>
+
+                <div class="pref-row">
+                  <div>
+                    <div class="pref-title">Manage Portfolios</div>
+                    <div class="pref-sub">Create, switch or delete accounts</div>
+                  </div>
+                  <button type="button" id="pref-open-wallets-btn" class="btn-secondary btn-sm">Portfolios</button>
+                </div>
+
+                <div class="pref-divider"></div>
+
+                <div class="pref-title" style="margin-bottom: 4px">Change Unlock Passcode</div>
+                <div class="password-change-inline">
+                  <input type="password" id="pref-new-password" placeholder="New passcode..." />
+                  <button type="button" id="pref-save-password-btn" class="btn-primary btn-sm">Update</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- BOTTOM NAVIGATION BAR (5 Tabs) -->
+      <nav class="bottom-nav-5">
+        <button type="button" class="nav-item active" data-tab="tab-home">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z" />
+          </svg>
+          <span>Portfolio</span>
+        </button>
+        <button type="button" class="nav-item" data-tab="tab-analytics">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+            <path d="M22 12A10 10 0 0 0 12 2v10z" />
+          </svg>
+          <span>Analytics</span>
+        </button>
+        <button type="button" class="nav-item" data-tab="tab-earn">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+          </svg>
+          <span>Earn</span>
+        </button>
+        <button type="button" class="nav-item" data-tab="tab-trade">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="17 1 21 5 17 9" />
+            <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+            <polyline points="7 23 3 19 7 15" />
+            <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+          </svg>
+          <span>Swap/Mkt</span>
+        </button>
+        <button type="button" class="nav-item" data-tab="tab-hub">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+          </svg>
+          <span>Hub</span>
+        </button>
+      </nav>
+    </section>
+
+    <!-- MODAL 1: PORTFOLIO SWITCHER & MANAGER -->
+    <div id="wallets-modal" class="modal-overlay hidden">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h2>Manage Simulated Portfolios</h2>
+          <button class="close-modal-btn" data-close="wallets-modal">✕</button>
+        </div>
+        <div id="wallets-list-container" class="wallets-list"></div>
+        <form id="create-wallet-form" class="create-wallet-form">
+          <input
+            type="text"
+            id="new-wallet-name"
+            placeholder="New portfolio name (e.g. Cold Vault Sim)"
+            maxlength="28"
+            required
+          />
+          <button type="submit" class="btn-primary btn-sm">+ Add</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 2: HOLDINGS & AVG BUY PRICE EDITOR -->
+    <div id="settings-modal" class="modal-overlay hidden">
+      <div class="modal-sheet modal-sheet-large">
+        <div class="modal-header">
+          <div>
+            <h2>Edit Holdings & Avg Buy Price ($)</h2>
+            <p class="modal-subtitle" id="settings-wallet-label">Editing: Main Portfolio</p>
+          </div>
+          <button class="close-modal-btn" data-close="settings-modal">✕</button>
+        </div>
+
+        <div class="settings-col-headers">
+          <span>Asset</span>
+          <span>Quantity</span>
+          <span>Avg Buy ($)</span>
+        </div>
+
+        <div class="settings-body">
+          <div id="balance-inputs-container" class="balance-inputs-grid"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-close="settings-modal">Cancel</button>
+          <button type="button" id="save-settings-btn" class="btn-primary">Save Holdings</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 3: SEND SIMULATOR (WITH ADDRESS BOOK PICKER) -->
+    <div id="send-modal" class="modal-overlay hidden">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h2>Simulate Outgoing Transfer</h2>
+          <button class="close-modal-btn" data-close="send-modal">✕</button>
+        </div>
+        <form id="send-form" class="swap-form">
+          <div class="input-group">
+            <label>Select Asset</label>
+            <select id="send-symbol-select"></select>
+          </div>
+          <div class="input-group">
+            <div class="label-row-between">
+              <label>Recipient Demo Address</label>
+              <select id="send-contact-picker" class="contact-picker-mini">
+                <option value="">📖 Address Book...</option>
+              </select>
+            </div>
+            <input type="text" id="send-address-input" placeholder="e.g. 0xDemo71C...89A" required />
+          </div>
+          <div class="input-group">
+            <label>Amount to Send</label>
+            <input type="number" id="send-amount-input" step="any" min="0.000001" placeholder="0.00" required />
+          </div>
+          <button type="submit" class="btn-primary">Confirm Simulated Send</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 4: RECEIVE QR SIMULATOR -->
+    <div id="receive-modal" class="modal-overlay hidden">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h2>Receive Simulated Asset</h2>
+          <button class="close-modal-btn" data-close="receive-modal">✕</button>
+        </div>
+        <div class="receive-body">
+          <select id="receive-symbol-select" class="receive-select"></select>
+          <div id="receive-qr-box" class="qr-box"></div>
+          <div class="demo-address-box" id="receive-address-text"></div>
+          <div class="receive-actions">
+            <button type="button" id="copy-address-btn" class="btn-secondary btn-sm">Copy Demo Address</button>
+            <button type="button" id="sim-deposit-btn" class="btn-primary btn-sm">+ Simulate +1 Deposit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 5: STAKE / UNSTAKE ASSET -->
+    <div id="stake-modal" class="modal-overlay hidden">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h2 id="stake-modal-title">Stake Asset</h2>
+          <button class="close-modal-btn" data-close="stake-modal">✕</button>
+        </div>
+        <form id="stake-form" class="swap-form">
+          <div id="stake-modal-info" class="swap-preview">Available: 0 • Currently Staked: 0</div>
+          <div class="input-group">
+            <label>Action</label>
+            <select id="stake-action-select">
+              <option value="stake">Stake from Portfolio</option>
+              <option value="unstake">Unstake back to Portfolio</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Amount</label>
+            <input type="number" id="stake-amount-input" step="any" min="0.0001" placeholder="0.00" required />
+          </div>
+          <button type="submit" class="btn-primary">Confirm Staking Action</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
