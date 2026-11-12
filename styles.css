@@ -81,30 +81,6 @@ body {
   white-space: nowrap;
 }
 
-/* Top Simulator Badge */
-.demo-banner {
-  background: linear-gradient(90deg, #312e81, #4c1d95, #831843);
-  color: #e0e7ff;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 5px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  flex-shrink: 0;
-}
-
-.demo-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #34d399;
-  box-shadow: 0 0 6px #34d399;
-}
-
 /* Screens */
 .screen {
   display: none;
@@ -1429,7 +1405,7 @@ select:focus {
   justify-content: center;
 }
 
-.demo-address-box {
+.address-box {
   width: 100%;
   background: var(--bg-elevated);
   border: 1px solid var(--border-subtle);

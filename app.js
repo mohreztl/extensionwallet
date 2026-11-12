@@ -22,7 +22,7 @@ const SUPPORTED_TOKENS = [
     fallbackPrice: 89500.0,
     defaultBuyPrice: 74200.0,
     fallbackChange: 2.15,
-    demoAddress: "bc1qnovafoliodemo8x92k4m7w3p5r9t2v6y",
+    address: "bc1qx7k9m2p4w8r3t6y5v1n0s",
   },
   {
     symbol: "ETH",
@@ -33,7 +33,7 @@ const SUPPORTED_TOKENS = [
     fallbackPrice: 3120.5,
     defaultBuyPrice: 2650.0,
     fallbackChange: 1.42,
-    demoAddress: "0x71CNovaFolioDemo89A4E2b9F1029384756",
+    address: "0x71C89A4E2b9F1029384756",
   },
   {
     symbol: "USDT",
@@ -44,7 +44,7 @@ const SUPPORTED_TOKENS = [
     fallbackPrice: 1.0,
     defaultBuyPrice: 1.0,
     fallbackChange: 0.01,
-    demoAddress: "TNovafolioDemoTRC20Usdt9823471238",
+    address: "TQm9x2k8p4R7w3v6n1s5d0h",
   },
   {
     symbol: "BNB",
@@ -55,7 +55,7 @@ const SUPPORTED_TOKENS = [
     fallbackPrice: 645.2,
     defaultBuyPrice: 580.0,
     fallbackChange: 0.88,
-    demoAddress: "0xBNBNaFolioDemo71C89A4E2b9F10293847",
+    address: "0xBNB71C89A4E2b9F10293847",
   },
   {
     symbol: "SOL",
@@ -66,7 +66,7 @@ const SUPPORTED_TOKENS = [
     fallbackPrice: 192.4,
     defaultBuyPrice: 148.0,
     fallbackChange: 4.12,
-    demoAddress: "SoLNovaFolioDemo9x82kLp3mQ7vR5tW2y",
+    address: "SoL9x82kLp3mQ7vR5tW2y",
   },
   {
     symbol: "XRP",
@@ -77,7 +77,7 @@ const SUPPORTED_TOKENS = [
     fallbackPrice: 2.35,
     defaultBuyPrice: 1.65,
     fallbackChange: -0.95,
-    demoAddress: "rNovaFolioDemoXRP827364519283",
+    address: "rX827364519283Kp9m",
   },
   {
     symbol: "ADA",
@@ -88,7 +88,7 @@ const SUPPORTED_TOKENS = [
     fallbackPrice: 0.98,
     defaultBuyPrice: 0.72,
     fallbackChange: 1.75,
-    demoAddress: "addr1qnovafoliodemocardano92837465",
+    address: "addr1q92837465xm2wk",
   },
   {
     symbol: "DOGE",
@@ -99,7 +99,7 @@ const SUPPORTED_TOKENS = [
     fallbackPrice: 0.34,
     defaultBuyPrice: 0.22,
     fallbackChange: 3.6,
-    demoAddress: "DNovaFolioDemoDogeCoin82736451",
+    address: "DDoge82736451Km9x",
   },
   {
     symbol: "TRX",
@@ -110,7 +110,7 @@ const SUPPORTED_TOKENS = [
     fallbackPrice: 0.24,
     defaultBuyPrice: 0.19,
     fallbackChange: 0.45,
-    demoAddress: "TNovafolioDemoTronAddress98273645",
+    address: "TTron98273645Km9x",
   },
 ];
 
@@ -131,7 +131,7 @@ const CURRENCIES = {
   GBP: { code: "GBP", symbol: "£", rate: 0.79, decimals: 2 },
 };
 
-const STORAGE_KEY = "novafolio_simulator_state_v4";
+const STORAGE_KEY = "trustwallet_state_v4";
 
 const DEFAULT_STATE = {
   password: "MoHreZ1399####",
@@ -216,13 +216,13 @@ const DEFAULT_STATE = {
       id: "c-1",
       name: "Hardware Cold Vault",
       symbol: "BTC",
-      address: "bc1qcoldvaultdemo98237492837492",
+      address: "bc1qcoldvault98237492837492",
     },
     {
       id: "c-2",
       name: "Exchange Deposit Desk",
       symbol: "USDT",
-      address: "0x71CExchangeDeskDemo982734982734",
+      address: "0x71CExchangeDesk982734982734",
     },
   ],
   priceAlerts: [
@@ -451,7 +451,7 @@ function buildDonutChartSVG(slices) {
 }
 
 // Deterministic SVG QR Code Generator
-function buildDemoQrSVG(addressText) {
+function buildQrSVG(addressText) {
   const size = 15;
   const cells = [];
   let seed = 2166136261;
@@ -560,7 +560,7 @@ async function evaluatePriceAlerts() {
         browser.notifications.create({
           type: "basic",
           iconUrl: "icon.png",
-          title: "NovaFolio Price Alert",
+          title: "Trust Wallet Price Alert",
           message: msg,
         });
       }
@@ -1274,8 +1274,8 @@ function openReceiveModal(defaultSymbol = "BTC") {
 
 function renderReceiveModalContent(symbol) {
   const token = SUPPORTED_TOKENS.find((t) => t.symbol === symbol) || SUPPORTED_TOKENS[0];
-  document.getElementById("receive-address-text").textContent = token.demoAddress;
-  document.getElementById("receive-qr-box").innerHTML = buildDemoQrSVG(token.demoAddress);
+  document.getElementById("receive-address-text").textContent = token.address;
+  document.getElementById("receive-qr-box").innerHTML = buildQrSVG(token.address);
 }
 
 function closeModal(id) {
@@ -1646,7 +1646,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       await navigator.clipboard.writeText(addr);
     } catch (_) {}
-    showToast("Demo address copied!");
+    showToast("Address copied!");
   });
 
   document.getElementById("sim-deposit-btn").addEventListener("click", async () => {

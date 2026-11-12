@@ -3,17 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NovaFolio — Portfolio Simulator</title>
+  <title>Trust Wallet — Crypto Portfolio</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="app">
-    <!-- Top Demo Banner -->
-    <div class="demo-banner">
-      <span class="demo-dot"></span>
-      <span>NOVAFOLIO • PORTFOLIO SIMULATOR (DEMO)</span>
-    </div>
-
     <!-- Triggered Alert Banner -->
     <div id="alert-banner" class="alert-banner hidden">
       <span id="alert-banner-text">🔔 Price Alert Triggered!</span>
@@ -27,9 +21,9 @@
     <section id="lock-screen" class="screen active">
       <div class="lock-container">
         <div class="brand-logo-wrap">
-          <img src="icon.png" alt="NovaFolio Logo" class="brand-logo" />
+          <img src="icon.png" alt="Trust Wallet Logo" class="brand-logo" />
         </div>
-        <h1 class="brand-title">NovaFolio</h1>
+        <h1 class="brand-title">Trust Wallet</h1>
         <p class="brand-subtitle" id="lock-subtitle">Enter your passcode to unlock your simulated portfolio</p>
 
         <form id="unlock-form" class="lock-form">
@@ -379,7 +373,7 @@
             <!-- Hub Pane 3: Address Book / Contacts -->
             <div id="hub-contacts-pane" class="subtab-pane">
               <form id="create-contact-form" class="inline-card-form">
-                <div class="card-title">Add Saved Demo Address</div>
+                <div class="card-title">Add Saved Address</div>
                 <div class="contact-form-row">
                   <input type="text" id="contact-name-input" placeholder="Label (e.g. Cold Vault)" maxlength="24" required />
                   <select id="contact-symbol-select"></select>
@@ -552,12 +546,12 @@
           </div>
           <div class="input-group">
             <div class="label-row-between">
-              <label>Recipient Demo Address</label>
+              <label>Recipient Address</label>
               <select id="send-contact-picker" class="contact-picker-mini">
                 <option value="">📖 Address Book...</option>
               </select>
             </div>
-            <input type="text" id="send-address-input" placeholder="e.g. 0xDemo71C...89A" required />
+            <input type="text" id="send-address-input" placeholder="e.g. 0x71C9...89A4" required />
           </div>
           <div class="input-group">
             <label>Amount to Send</label>
@@ -578,9 +572,9 @@
         <div class="receive-body">
           <select id="receive-symbol-select" class="receive-select"></select>
           <div id="receive-qr-box" class="qr-box"></div>
-          <div class="demo-address-box" id="receive-address-text"></div>
+          <div class="address-box" id="receive-address-text"></div>
           <div class="receive-actions">
-            <button type="button" id="copy-address-btn" class="btn-secondary btn-sm">Copy Demo Address</button>
+            <button type="button" id="copy-address-btn" class="btn-secondary btn-sm">Copy Address</button>
             <button type="button" id="sim-deposit-btn" class="btn-primary btn-sm">+ Simulate +1 Deposit</button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-# NovaFolio — Crypto Portfolio Simulator (Firefox Extension)
+# Trust Wallet — Crypto Portfolio Simulator (Firefox Extension)
 
 یک افزونه شبیه‌ساز سبد دارایی رمزارز (Portfolio Simulator) با طراحی مستقل برای مرورگر **Firefox**.
 
@@ -25,5 +25,5 @@
    about:debugging#/runtime/this-firefox
    ```
 2. روی دکمه **Load Temporary Add-on...** کلیک کنید.
-3. وارد پوشه `nova-portfolio-extension` شوید و فایل `manifest.json` را انتخاب کنید.
-4. آیکون **NovaFolio** به نوار ابزار فایرفاکس (و همچنین بخش Sidebar) اضافه می‌شود.
+3. وارد پوشه `extensionwallet` شوید و فایل `manifest.json` را انتخاب کنید.
+4. آیکون **Trust Wallet** به نوار ابزار فایرفاکس (و همچنین بخش Sidebar) اضافه می‌شود.
