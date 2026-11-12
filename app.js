@@ -346,6 +346,23 @@ function showToast(msg) {
   }, 2200);
 }
 
+// Escape user-provided text before injecting into HTML
+function escapeHtml(str) {
+  return String(str ?? "").replace(/[&<>"']/g, (ch) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[ch]);
+}
+
+function toLocalDatetimeValue(ts) {
+  const d = new Date(ts);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 // Currency & Number Formatters
 function formatFiat(usdValue, forceVisible = false) {
   if (appState.hideBalances && !forceVisible) return "••••••";
@@ -983,19 +1000,42 @@ function renderMarketTab() {
 
 // 6. Render Hub Tab (History, Price Alerts, Contacts / Address Book)
 function renderActivityItemHTML(item) {
-  const timeStr = new Date(item.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const timeStr = new Date(item.timestamp).toLocaleString([], {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
   return `
     <div class="activity-item">
       <div class="activity-left">
-        <span class="activity-type">${item.type} • ${item.symbol}</span>
-        <span class="activity-meta">${timeStr} • ${item.hash}</span>
+        <span class="activity-type">${escapeHtml(item.type)} • ${escapeHtml(item.symbol)}</span>
+        <span class="activity-meta">${timeStr} • ${escapeHtml(item.hash)}</span>
       </div>
       <div class="activity-right">
-        <div class="activity-amount">${item.details}</div>
-        <div class="activity-fiat">${formatFiat(item.usdValue, true)}</div>
+        <div class="activity-amount">${escapeHtml(item.details)}</div>
+        <div class="activity-fiat">${formatFiat(item.usdValue || 0, true)}</div>
+        <div class="tx-item-actions">
+          <button type="button" class="btn-tiny" data-edit-tx="${item.id}">✎ Edit</button>
+          <button type="button" class="delete-wallet-btn" data-del-tx="${item.id}">✕</button>
+        </div>
       </div>
     </div>
   `;
+}
+
+function openTxModal(item = null) {
+  document.getElementById("tx-form").reset();
+  document.getElementById("tx-edit-id").value = item ? item.id : "";
+  document.getElementById("tx-modal-title").textContent = item ? "Edit Transaction" : "Add Transaction";
+  document.getElementById("tx-submit-btn").textContent = item ? "Save Changes" : "Add Transaction";
+  document.getElementById("tx-type-input").value = item ? item.type : "Receive";
+  document.getElementById("tx-symbol-input").value = item ? item.symbol : "BTC";
+  document.getElementById("tx-details-input").value = item ? item.details : "";
+  document.getElementById("tx-usd-input").value = item ? item.usdValue : "";
+  document.getElementById("tx-hash-input").value = item ? item.hash : "";
+  document.getElementById("tx-datetime-input").value = toLocalDatetimeValue(item ? item.timestamp : Date.now());
+  document.getElementById("tx-modal").classList.remove("hidden");
 }
 
 function renderHubTab() {
@@ -1086,9 +1126,11 @@ function initSymbolSelectors() {
   const toSel = document.getElementById("swap-to-symbol");
   const alertSel = document.getElementById("alert-symbol-select");
   const contactSel = document.getElementById("contact-symbol-select");
+  const txSymSel = document.getElementById("tx-symbol-input");
 
   const optionsHtml = SUPPORTED_TOKENS.map((t) => `<option value="${t.symbol}">${t.symbol}</option>`).join("");
   if (fromSel) fromSel.innerHTML = optionsHtml;
+  if (txSymSel) txSymSel.innerHTML = optionsHtml;
   if (toSel) {
     toSel.innerHTML = optionsHtml;
     toSel.value = "USDT";
@@ -1735,6 +1777,61 @@ document.addEventListener("DOMContentLoaded", async () => {
     await saveState();
     renderAllViews();
     showToast("Activity log cleared");
+  });
+
+  // Add / Edit / Delete manual transactions
+  document.getElementById("add-tx-btn").addEventListener("click", () => openTxModal());
+
+  document.getElementById("tx-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const editId = document.getElementById("tx-edit-id").value;
+    const type = document.getElementById("tx-type-input").value;
+    const symbol = document.getElementById("tx-symbol-input").value;
+    const details = document.getElementById("tx-details-input").value.trim();
+    const usdValue = parseFloat(document.getElementById("tx-usd-input").value) || 0;
+    let hash = document.getElementById("tx-hash-input").value.trim();
+    const dtVal = document.getElementById("tx-datetime-input").value;
+    const timestamp = dtVal ? new Date(dtVal).getTime() : Date.now();
+    if (!details) return;
+
+    if (!hash) {
+      const randomHex = Array.from({ length: 4 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+      hash = `0x${randomHex}...${Date.now().toString(16).slice(-4)}`;
+    }
+
+    if (editId) {
+      const entry = appState.activityLog.find((t) => t.id === editId);
+      if (entry) Object.assign(entry, { type, symbol, details, usdValue, hash, timestamp });
+      showToast("Transaction updated");
+    } else {
+      appState.activityLog.unshift({ id: `tx-${Date.now()}`, type, symbol, details, usdValue, hash, timestamp });
+      if (appState.activityLog.length > 50) {
+        appState.activityLog = appState.activityLog.slice(0, 50);
+      }
+      showToast("Transaction added");
+    }
+    closeModal("tx-modal");
+    await saveState();
+    renderAllViews();
+  });
+
+  document.addEventListener("click", async (e) => {
+    const editBtn = e.target.closest("[data-edit-tx]");
+    if (editBtn) {
+      const item = appState.activityLog.find((t) => t.id === editBtn.dataset.editTx);
+      if (item) openTxModal(item);
+      return;
+    }
+    const delBtn = e.target.closest("[data-del-tx]");
+    if (delBtn) {
+      const item = appState.activityLog.find((t) => t.id === delBtn.dataset.delTx);
+      if (item && confirm(`Delete this transaction?\n${item.type} • ${item.details}`)) {
+        appState.activityLog = appState.activityLog.filter((t) => t.id !== item.id);
+        await saveState();
+        renderAllViews();
+        showToast("Transaction deleted");
+      }
+    }
   });
 
   // Close buttons on modals

@@ -1418,6 +1418,13 @@ select:focus {
   word-break: break-all;
 }
 
+.tx-item-actions {
+  display: flex;
+  gap: 5px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
 .receive-actions {
   display: flex;
   gap: 8px;

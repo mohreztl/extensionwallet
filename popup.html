@@ -348,7 +348,10 @@
             <div id="hub-history-pane" class="subtab-pane active">
               <div class="section-toolbar" style="padding: 4px 2px 6px">
                 <span class="section-heading">Simulated Transactions</span>
-                <button type="button" id="clear-history-btn" class="btn-tiny">Clear Log</button>
+                <div style="display:flex;gap:5px;">
+                  <button type="button" id="add-tx-btn" class="btn-tiny">＋ Add</button>
+                  <button type="button" id="clear-history-btn" class="btn-tiny">Clear Log</button>
+                </div>
               </div>
               <div id="activity-log-list" class="activity-list"></div>
             </div>
@@ -578,6 +581,52 @@
             <button type="button" id="sim-deposit-btn" class="btn-primary btn-sm">+ Simulate +1 Deposit</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- MODAL 6: ADD / EDIT TRANSACTION -->
+    <div id="tx-modal" class="modal-overlay hidden">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h2 id="tx-modal-title">Add Transaction</h2>
+          <button class="close-modal-btn" data-close="tx-modal">✕</button>
+        </div>
+        <form id="tx-form" class="swap-form">
+          <input type="hidden" id="tx-edit-id" />
+          <div class="input-group">
+            <label>Type</label>
+            <select id="tx-type-input">
+              <option>Receive</option>
+              <option>Send</option>
+              <option>Buy</option>
+              <option>Sell</option>
+              <option>Stake</option>
+              <option>Swap</option>
+              <option>Custom</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Asset</label>
+            <select id="tx-symbol-input"></select>
+          </div>
+          <div class="input-group">
+            <label>Details</label>
+            <input type="text" id="tx-details-input" placeholder="e.g. +0.5 BTC from Binance" maxlength="80" required />
+          </div>
+          <div class="input-group">
+            <label>USD Value (optional)</label>
+            <input type="number" id="tx-usd-input" step="any" min="0" placeholder="0.00" />
+          </div>
+          <div class="input-group">
+            <label>Hash / Ref (optional)</label>
+            <input type="text" id="tx-hash-input" placeholder="0x..." maxlength="40" />
+          </div>
+          <div class="input-group">
+            <label>Date &amp; Time</label>
+            <input type="datetime-local" id="tx-datetime-input" />
+          </div>
+          <button type="submit" class="btn-primary" id="tx-submit-btn">Add Transaction</button>
+        </form>
       </div>
     </div>
 
